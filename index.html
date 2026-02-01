@@ -5,23 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <!-- SEO Meta Tags -->
-  <title>Clawd Control — AI Agent Health Monitoring</title>
-  <meta name="description" content="Production-grade health monitoring dashboard for AI agent teams. Track skills, configs, and system health across multiple Clawdbot agents in real-time.">
-  <meta name="keywords" content="AI agents, Clawdbot, monitoring, dashboard, health check, agent management">
+  <title>Clawd Control — Open-Source AI Agent Health Monitoring</title>
+  <meta name="description" content="Open-source health monitoring dashboard for AI agent teams. Track skills, configs, and system health across your Clawdbot agents. Free forever.">
+  <meta name="keywords" content="AI agents, Clawdbot, monitoring, dashboard, health check, agent management, open source">
   <meta name="author" content="Miguel Amaral & Gandalf">
   
   <!-- Open Graph / Social Media -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://clawdcontrol.com/">
-  <meta property="og:title" content="Clawd Control — AI Agent Health Monitoring">
-  <meta property="og:description" content="Production-grade health monitoring dashboard for AI agent teams.">
+  <meta property="og:title" content="Clawd Control — Open-Source AI Agent Health Monitoring">
+  <meta property="og:description" content="Open-source health monitoring for AI agent teams. Free forever.">
   <meta property="og:image" content="https://clawdcontrol.com/og-image.png">
   
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://clawdcontrol.com/">
-  <meta name="twitter:title" content="Clawd Control — AI Agent Health Monitoring">
-  <meta name="twitter:description" content="Production-grade health monitoring dashboard for AI agent teams.">
+  <meta name="twitter:title" content="Clawd Control — Open-Source AI Agent Health Monitoring">
+  <meta name="twitter:description" content="Open-source health monitoring for AI agent teams. Free forever.">
   <meta name="twitter:image" content="https://clawdcontrol.com/og-image.png">
   
   <!-- Favicon -->
@@ -501,13 +501,12 @@
         <div class="hero-emoji">🏰</div>
         <h1 class="hero-title">Clawd Control</h1>
         <p class="hero-subtitle">
-          Production-grade health monitoring dashboard for AI agent teams. 
-          Track skills, configurations, and system health across multiple Clawdbot agents in real-time.
+          Open-source health monitoring for AI agent teams.
+          Track skills, configs, and system health across your Clawdbot agents — free forever.
         </p>
         <div class="hero-cta">
           <a href="https://github.com/gandalf-temaki/clawd-control" class="btn btn-primary" target="_blank" rel="noopener">
-            <span>View on GitHub</span>
-            <span>→</span>
+            <span>⭐ Star on GitHub</span>
           </a>
           <a href="#features" class="btn btn-secondary">
             <span>Learn More</span>
@@ -660,10 +659,10 @@ open dashboard-v2.html</code>
     <div class="container">
       <div class="section-header">
         <span class="section-tag">Stay Updated</span>
-        <h2 class="section-title">Get Early Access</h2>
+        <h2 class="section-title">Join the Community</h2>
         <p class="section-description">
-          Join the waitlist to be notified when new features drop, 
-          get setup guides, and connect with other agent builders.
+          Get notified about new releases, guides, and community contributions.
+          Open source — built in the open, together.
         </p>
       </div>
       
@@ -697,8 +696,7 @@ open dashboard-v2.html</code>
     <div class="container">
       <div class="footer-content">
         <p class="footer-text">
-          Built with 🍏 by <strong>Pippin</strong> & <strong>Gandalf</strong> · 
-          Created for <strong>Miguel Amaral's</strong> AI Agents
+          Open source — built by AI agents, for AI agents 🍏
         </p>
         <div class="footer-links">
           <a href="https://github.com/gandalf-temaki/clawd-control" class="footer-link" target="_blank" rel="noopener">GitHub</a>
@@ -714,9 +712,9 @@ open dashboard-v2.html</code>
   </footer>
 
   <script>
-    // Waitlist form — Formspark integration
-    // Replace FORMSPARK_FORM_ID with your actual form ID from https://formspark.io
     const FORMSPARK_ACTION = 'https://submit-form.com/bTiV6XSOO';
+    // Discord webhook — set this to post signups to a channel
+    const DISCORD_WEBHOOK = 'DISCORD_WEBHOOK_URL';
     
     document.getElementById('waitlistForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -728,11 +726,28 @@ open dashboard-v2.html</code>
       btn.disabled = true;
       
       try {
+        // Save to Formspark
         await fetch(FORMSPARK_ACTION, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({ email, _email: { subject: 'New Clawd Control waitlist signup' } })
+          body: JSON.stringify({ email, _email: { subject: 'New Clawd Control signup' } })
         });
+        
+        // Notify Discord
+        if (DISCORD_WEBHOOK && !DISCORD_WEBHOOK.includes('DISCORD_WEBHOOK_URL')) {
+          fetch(DISCORD_WEBHOOK, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              embeds: [{
+                title: '🏰 New Clawd Control Signup',
+                description: `**${email}** joined the community!`,
+                color: 0xc9a44a,
+                timestamp: new Date().toISOString()
+              }]
+            })
+          }).catch(() => {}); // fire-and-forget
+        }
         
         successMsg.hidden = false;
         document.querySelector('.email-input-group').style.display = 'none';
