@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO Meta Tags -->
+  <title>Clawd Control — Fellowship Health Monitoring Dashboard</title>
+  <meta name="description" content="Production-grade health monitoring dashboard for AI agent fellowships. Track skills, configs, and system health across multiple Clawdbot agents in real-time.">
+  <meta name="keywords" content="AI agents, Clawdbot, monitoring, dashboard, fellowship, health check, agent management">
+  <meta name="author" content="Miguel Amaral & Gandalf">
+  
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://clawdcontrol.com/">
+  <meta property="og:title" content="Clawd Control — Fellowship Health Monitoring Dashboard">
+  <meta property="og:description" content="Production-grade health monitoring dashboard for AI agent fellowships.">
+  <meta property="og:image" content="https://clawdcontrol.com/og-image.png">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://clawdcontrol.com/">
+  <meta name="twitter:title" content="Clawd Control — Fellowship Health Monitoring Dashboard">
+  <meta name="twitter:description" content="Production-grade health monitoring dashboard for AI agent fellowships.">
+  <meta name="twitter:image" content="https://clawdcontrol.com/og-image.png">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏰</text></svg>">
+  
+  <style>
+    /* Design System — 2026 Production Grade */
+    :root {
+      /* Colors */
+      --bg-primary: #0a0b0f;
+      --bg-secondary: #12141a;
+      --bg-tertiary: #1a1d27;
+      --border-subtle: #252834;
+      --border-default: #2d3142;
+      --text-primary: #f4f4f5;
+      --text-secondary: #a1a1aa;
+      --text-muted: #6b7280;
+      
+      /* Accent — Fellowship Gold */
+      --accent-primary: #c9a44a;
+      --accent-hover: #d4b05c;
+      --accent-glow: rgba(201, 164, 74, 0.2);
+      
+      /* Status */
+      --status-success: #10b981;
+      --status-warning: #f59e0b;
+      --status-error: #ef4444;
+      
+      /* Typography */
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+      --font-mono: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+      
+      /* Spacing */
+      --space-1: 0.5rem;
+      --space-2: 1rem;
+      --space-3: 1.5rem;
+      --space-4: 2rem;
+      --space-5: 2.5rem;
+      --space-6: 3rem;
+      --space-8: 4rem;
+      --space-12: 6rem;
+      
+      /* Shadows */
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4);
+      
+      /* Animations */
+      --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+    
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-3);
+    }
+    
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+      animation: pulse 8s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.5; }
+    }
+    
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .hero-emoji {
+      font-size: 6rem;
+      margin-bottom: var(--space-4);
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    .hero-title {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      margin-bottom: var(--space-3);
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .hero-subtitle {
+      font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+      color: var(--text-secondary);
+      max-width: 700px;
+      margin: 0 auto var(--space-5);
+      line-height: 1.8;
+    }
+    
+    .hero-cta {
+      display: inline-flex;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-5);
+      border: none;
+      border-radius: 12px;
+      font-size: 1.125rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all var(--transition-base);
+    }
+    
+    .btn-primary {
+      background: var(--accent-primary);
+      color: var(--bg-primary);
+      box-shadow: 0 0 30px var(--accent-glow);
+    }
+    
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 0 40px var(--accent-glow);
+    }
+    
+    .btn-secondary {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-default);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--bg-tertiary);
+      border-color: var(--accent-primary);
+    }
+    
+    /* Section */
+    .section {
+      padding: var(--space-12) 0;
+    }
+    
+    .section-header {
+      text-align: center;
+      margin-bottom: var(--space-8);
+    }
+    
+    .section-tag {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-primary);
+      margin-bottom: var(--space-2);
+    }
+    
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      margin-bottom: var(--space-2);
+    }
+    
+    .section-description {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    /* Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-4);
+    }
+    
+    .feature-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: var(--space-5);
+      transition: all var(--transition-base);
+    }
+    
+    .feature-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: var(--space-3);
+    }
+    
+    .feature-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+    }
+    
+    .feature-description {
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-4);
+      margin-top: var(--space-6);
+    }
+    
+    .stat-card {
+      text-align: center;
+      padding: var(--space-4);
+    }
+    
+    .stat-value {
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--accent-primary);
+      margin-bottom: var(--space-1);
+    }
+    
+    .stat-label {
+      font-size: 1rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    /* Tech Stack */
+    .tech-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      justify-content: center;
+      margin-top: var(--space-4);
+    }
+    
+    .tech-badge {
+      padding: 0.75rem 1.5rem;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+    
+    /* Footer */
+    .footer {
+      padding: var(--space-6) 0;
+      border-top: 1px solid var(--border-subtle);
+      text-align: center;
+    }
+    
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      align-items: center;
+    }
+    
+    .footer-text {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+    
+    .footer-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color var(--transition-base);
+    }
+    
+    .footer-link:hover {
+      color: var(--accent-primary);
+    }
+    
+    /* Code Block */
+    .code-block {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-default);
+      border-radius: 12px;
+      padding: var(--space-4);
+      margin: var(--space-4) 0;
+      overflow-x: auto;
+    }
+    
+    .code-block code {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: var(--accent-primary);
+      line-height: 1.8;
+    }
+    
+    /* Email Capture */
+    .email-form {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+    
+    .email-input-group {
+      display: flex;
+      gap: var(--space-2);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: 14px;
+      padding: 6px;
+      transition: border-color var(--transition-base);
+    }
+    
+    .email-input-group:focus-within {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+    
+    .email-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: var(--space-2) var(--space-3);
+      font-size: 1rem;
+      font-family: var(--font-sans);
+      color: var(--text-primary);
+    }
+    
+    .email-input::placeholder {
+      color: var(--text-muted);
+    }
+    
+    .email-btn {
+      padding: var(--space-2) var(--space-4);
+      border-radius: 10px;
+      font-size: 1rem;
+      white-space: nowrap;
+    }
+    
+    .email-note {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.8125rem;
+      margin-top: var(--space-2);
+    }
+    
+    .email-success {
+      text-align: center;
+      color: var(--status-success);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-top: var(--space-3);
+      animation: fadeIn 0.4s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero {
+        min-height: 80vh;
+      }
+      
+      .hero-emoji {
+        font-size: 4rem;
+      }
+      
+      .hero-cta {
+        flex-direction: column;
+        width: 100%;
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .section {
+        padding: var(--space-8) 0;
+      }
+      
+      .email-input-group {
+        flex-direction: column;
+      }
+      
+      .email-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-emoji">🏰</div>
+        <h1 class="hero-title">Clawd Control</h1>
+        <p class="hero-subtitle">
+          Production-grade health monitoring dashboard for AI agent fellowships. 
+          Track skills, configurations, and system health across multiple Clawdbot agents in real-time.
+        </p>
+        <div class="hero-cta">
+          <a href="https://github.com/gandalf-temaki/fellowship-control-panel" class="btn btn-primary" target="_blank" rel="noopener">
+            <span>View on GitHub</span>
+            <span>→</span>
+          </a>
+          <a href="#features" class="btn btn-secondary">
+            <span>Learn More</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Features</span>
+        <h2 class="section-title">Everything You Need to Monitor Your Fellowship</h2>
+        <p class="section-description">
+          Comprehensive health checks, real-time insights, and beautiful visualizations 
+          for your AI agent ecosystem.
+        </p>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">✅</div>
+          <h3 class="feature-title">31-Point Health Checks</h3>
+          <p class="feature-description">
+            Verify essential skills, workspace files, credentials, gateway configs, 
+            memory architecture, and more. Comprehensive validation for every agent.
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3 class="feature-title">Interactive Dashboards</h3>
+          <p class="feature-description">
+            Beautiful card-based UI with real-time data, trend charts, and detailed 
+            drill-down views. Production-grade 2026 design system.
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📈</div>
+          <h3 class="feature-title">Health Trend Tracking</h3>
+          <p class="feature-description">
+            Visualize agent health over time with interactive SVG charts. 
+            Spot degradation early and track improvements with 7/30/90-day views.
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3 class="feature-title">Category Breakdown</h3>
+          <p class="feature-description">
+            Organized checks across Workspace Files, Essential Skills, Credentials, 
+            Memory, Scripts, Gateway Config, and GitHub integration.
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3 class="feature-title">Agent Creation Wizard</h3>
+          <p class="feature-description">
+            Multi-step wizard to set up new agents with guided configuration. 
+            Select skills, configure heartbeat, and customize settings with ease.
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">♿</div>
+          <h3 class="feature-title">Fully Accessible</h3>
+          <p class="feature-description">
+            WCAG 2.2 AA compliant with keyboard navigation, screen reader support, 
+            and reduced-motion options. Built for everyone.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Stack Section -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Technology</span>
+        <h2 class="section-title">Built with Modern Standards</h2>
+        <p class="section-description">
+          Zero external dependencies. Pure HTML, CSS, and JavaScript. 
+          Fast, secure, and maintainable.
+        </p>
+      </div>
+      
+      <div class="tech-stack">
+        <span class="tech-badge">Node.js</span>
+        <span class="tech-badge">ES Modules</span>
+        <span class="tech-badge">CSS Variables</span>
+        <span class="tech-badge">SVG Charts</span>
+        <span class="tech-badge">Fluid Typography</span>
+        <span class="tech-badge">8px Grid System</span>
+        <span class="tech-badge">Mobile-First</span>
+        <span class="tech-badge">WCAG 2.2 AA</span>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">31</div>
+          <div class="stat-label">Health Checks</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">100%</div>
+          <div class="stat-label">Accessible</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Dependencies</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Getting Started Section -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Quick Start</span>
+        <h2 class="section-title">Get Started in Minutes</h2>
+        <p class="section-description">
+          Clone the repository and run your first health check.
+        </p>
+      </div>
+      
+      <div class="code-block">
+        <code># Clone the repository
+git clone https://github.com/gandalf-temaki/fellowship-control-panel.git
+cd fellowship-control-panel
+
+# Run health check
+node check.mjs --workspace /path/to/agent/workspace
+
+# Start collecting historical data
+node collect-history.mjs --all
+
+# Open dashboard
+open dashboard-v2.html</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- Email Capture Section -->
+  <section class="section" id="waitlist">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Stay Updated</span>
+        <h2 class="section-title">Get Early Access</h2>
+        <p class="section-description">
+          Join the waitlist to be notified when new features drop, 
+          get setup guides, and connect with other fellowship builders.
+        </p>
+      </div>
+      
+      <form class="email-form" id="waitlistForm" action="#" method="POST">
+        <div class="email-input-group">
+          <input 
+            type="email" 
+            class="email-input" 
+            id="emailInput"
+            name="email" 
+            placeholder="you@example.com" 
+            required 
+            autocomplete="email"
+            aria-label="Email address"
+          >
+          <button type="submit" class="btn btn-primary email-btn">
+            <span>Join Waitlist</span>
+            <span>→</span>
+          </button>
+        </div>
+        <p class="email-note">No spam, ever. Unsubscribe anytime.</p>
+        <p class="email-success" id="emailSuccess" hidden>
+          🎉 You're in! We'll be in touch.
+        </p>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p class="footer-text">
+          Built with 🍏 by <strong>Pippin</strong> & <strong>Gandalf</strong> · 
+          Created for <strong>Miguel Amaral's</strong> AI Fellowship
+        </p>
+        <div class="footer-links">
+          <a href="https://github.com/gandalf-temaki/fellowship-control-panel" class="footer-link" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/gandalf-temaki/fellowship-control-panel/blob/main/README.md" class="footer-link" target="_blank" rel="noopener">Documentation</a>
+          <a href="https://github.com/gandalf-temaki/fellowship-control-panel/issues" class="footer-link" target="_blank" rel="noopener">Issues</a>
+          <a href="https://clawdcontrol.com" class="footer-link">Home</a>
+        </div>
+        <p class="footer-text" style="margin-top: var(--space-2); font-size: 0.75rem;">
+          © 2026 Clawd Control · Open Source · MIT License
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Waitlist form — Formspark integration
+    // Replace FORMSPARK_FORM_ID with your actual form ID from https://formspark.io
+    const FORMSPARK_ACTION = 'https://submit-form.com/FORMSPARK_FORM_ID';
+    
+    document.getElementById('waitlistForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('emailInput').value;
+      const btn = e.target.querySelector('.email-btn');
+      const successMsg = document.getElementById('emailSuccess');
+      
+      btn.innerHTML = '<span>Joining...</span>';
+      btn.disabled = true;
+      
+      try {
+        await fetch(FORMSPARK_ACTION, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ email, _email: { subject: 'New Clawd Control waitlist signup' } })
+        });
+        
+        successMsg.hidden = false;
+        document.querySelector('.email-input-group').style.display = 'none';
+        document.querySelector('.email-note').style.display = 'none';
+      } catch (err) {
+        btn.innerHTML = '<span>Try Again</span><span>→</span>';
+        btn.disabled = false;
+      }
+    });
+  </script>
+
+</body>
+</html>

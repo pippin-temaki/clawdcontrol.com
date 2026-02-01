@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Page Not Found | Clawd Control</title>
+  <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏰</text></svg>">
+  
+  <style>
+    :root {
+      --bg-primary: #0a0b0f;
+      --text-primary: #f4f4f5;
+      --text-secondary: #a1a1aa;
+      --accent-primary: #c9a44a;
+      --accent-hover: #d4b05c;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html, body {
+      height: 100%;
+    }
+    
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .container {
+      max-width: 600px;
+    }
+    
+    .emoji {
+      font-size: 6rem;
+      margin-bottom: 2rem;
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    h1 {
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 900;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    p {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 1rem 2rem;
+      background: var(--accent-primary);
+      color: var(--bg-primary);
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 250ms;
+    }
+    
+    .btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="emoji">🏰</div>
+    <h1>404</h1>
+    <p>The page you're looking for doesn't exist in this realm.</p>
+    <a href="/" class="btn">Return Home</a>
+  </div>
+</body>
+</html>
