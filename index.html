@@ -873,7 +873,10 @@ document.querySelectorAll('[data-count], [data-text]').forEach(el => counterObse
 // ═══════════════════════════════════════════
 
 const FORMSPARK_ACTION = 'https://submit-form.com/bTiV6XSOO';
-const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1467596376828543067/T-HnUNHCtDzvjK4Jm3rlRp8rAmgIgr-06jFw8YgNDcGVfScv5I--t8WYfgdDcj0XotNv';
+// ⚠️ SECURITY: Never hardcode webhook URLs in client-side code.
+// Use a server-side proxy or environment variable injection at build time.
+// See: https://github.com/pippin-temaki/clawdcontrol.com/issues/1
+const DISCORD_WEBHOOK = ''; // Removed — was exposed in public git history (GitGuardian alert)
 
 document.getElementById('waitlistForm').addEventListener('submit', async (e) => {
   e.preventDefault();
