@@ -1,763 +1,919 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- SEO Meta Tags -->
-  <title>Clawd Control — Open-Source AI Agent Health Monitoring</title>
-  <meta name="description" content="Open-source health monitoring dashboard for AI agent teams. Track skills, configs, and system health across your Clawdbot agents. Free forever.">
-  <meta name="keywords" content="AI agents, Clawdbot, monitoring, dashboard, health check, agent management, open source">
-  <meta name="author" content="Miguel Amaral & Gandalf">
-  
-  <!-- Open Graph / Social Media -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://clawdcontrol.com/">
-  <meta property="og:title" content="Clawd Control — Open-Source AI Agent Health Monitoring">
-  <meta property="og:description" content="Open-source health monitoring for AI agent teams. Free forever.">
-  <meta property="og:image" content="https://clawdcontrol.com/og-image.png">
-  
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="https://clawdcontrol.com/">
-  <meta name="twitter:title" content="Clawd Control — Open-Source AI Agent Health Monitoring">
-  <meta name="twitter:description" content="Open-source health monitoring for AI agent teams. Free forever.">
-  <meta name="twitter:image" content="https://clawdcontrol.com/og-image.png">
-  
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏰</text></svg>">
-  
-  <style>
-    /* Design System — 2026 Production Grade */
-    :root {
-      /* Colors */
-      --bg-primary: #0a0b0f;
-      --bg-secondary: #12141a;
-      --bg-tertiary: #1a1d27;
-      --border-subtle: #252834;
-      --border-default: #2d3142;
-      --text-primary: #f4f4f5;
-      --text-secondary: #a1a1aa;
-      --text-muted: #6b7280;
-      
-      /* Accent — Clawd Gold */
-      --accent-primary: #c9a44a;
-      --accent-hover: #d4b05c;
-      --accent-glow: rgba(201, 164, 74, 0.2);
-      
-      /* Status */
-      --status-success: #10b981;
-      --status-warning: #f59e0b;
-      --status-error: #ef4444;
-      
-      /* Typography */
-      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
-      --font-mono: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
-      
-      /* Spacing */
-      --space-1: 0.5rem;
-      --space-2: 1rem;
-      --space-3: 1.5rem;
-      --space-4: 2rem;
-      --space-5: 2.5rem;
-      --space-6: 3rem;
-      --space-8: 4rem;
-      --space-12: 6rem;
-      
-      /* Shadows */
-      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3);
-      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4);
-      
-      /* Animations */
-      --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    /* Reset */
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    html {
-      scroll-behavior: smooth;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-    
-    body {
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      font-family: var(--font-sans);
-      font-size: 16px;
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-    
-    /* Accessibility */
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-      }
-    }
-    
-    /* Container */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 var(--space-3);
-    }
-    
-    /* Hero Section */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 800px;
-      height: 800px;
-      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-      pointer-events: none;
-      animation: pulse 8s ease-in-out infinite;
-    }
-    
-    @keyframes pulse {
-      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
-      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.5; }
-    }
-    
-    .hero-content {
-      position: relative;
-      z-index: 1;
-    }
-    
-    .hero-emoji {
-      font-size: 6rem;
-      margin-bottom: var(--space-4);
-      animation: float 6s ease-in-out infinite;
-    }
-    
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-20px); }
-    }
-    
-    .hero-title {
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      font-weight: 900;
-      margin-bottom: var(--space-3);
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .hero-subtitle {
-      font-size: clamp(1.125rem, 2.5vw, 1.5rem);
-      color: var(--text-secondary);
-      max-width: 700px;
-      margin: 0 auto var(--space-5);
-      line-height: 1.8;
-    }
-    
-    .hero-cta {
-      display: inline-flex;
-      gap: var(--space-3);
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    
-    /* Buttons */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-2);
-      padding: var(--space-3) var(--space-5);
-      border: none;
-      border-radius: 12px;
-      font-size: 1.125rem;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all var(--transition-base);
-    }
-    
-    .btn-primary {
-      background: var(--accent-primary);
-      color: var(--bg-primary);
-      box-shadow: 0 0 30px var(--accent-glow);
-    }
-    
-    .btn-primary:hover {
-      background: var(--accent-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 0 40px var(--accent-glow);
-    }
-    
-    .btn-secondary {
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      border: 1px solid var(--border-default);
-    }
-    
-    .btn-secondary:hover {
-      background: var(--bg-tertiary);
-      border-color: var(--accent-primary);
-    }
-    
-    /* Section */
-    .section {
-      padding: var(--space-12) 0;
-    }
-    
-    .section-header {
-      text-align: center;
-      margin-bottom: var(--space-8);
-    }
-    
-    .section-tag {
-      display: inline-block;
-      padding: 0.5rem 1rem;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-subtle);
-      border-radius: 20px;
-      font-size: 0.875rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--accent-primary);
-      margin-bottom: var(--space-2);
-    }
-    
-    .section-title {
-      font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 800;
-      margin-bottom: var(--space-2);
-    }
-    
-    .section-description {
-      font-size: 1.25rem;
-      color: var(--text-secondary);
-      max-width: 700px;
-      margin: 0 auto;
-    }
-    
-    /* Features Grid */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: var(--space-4);
-    }
-    
-    .feature-card {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      padding: var(--space-5);
-      transition: all var(--transition-base);
-    }
-    
-    .feature-card:hover {
-      border-color: var(--accent-primary);
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-xl);
-    }
-    
-    .feature-icon {
-      font-size: 2.5rem;
-      margin-bottom: var(--space-3);
-    }
-    
-    .feature-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: var(--space-2);
-    }
-    
-    .feature-description {
-      color: var(--text-secondary);
-      line-height: 1.7;
-    }
-    
-    /* Stats */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--space-4);
-      margin-top: var(--space-6);
-    }
-    
-    .stat-card {
-      text-align: center;
-      padding: var(--space-4);
-    }
-    
-    .stat-value {
-      font-size: 3rem;
-      font-weight: 900;
-      color: var(--accent-primary);
-      margin-bottom: var(--space-1);
-    }
-    
-    .stat-label {
-      font-size: 1rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    
-    /* Tech Stack */
-    .tech-stack {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-2);
-      justify-content: center;
-      margin-top: var(--space-4);
-    }
-    
-    .tech-badge {
-      padding: 0.75rem 1.5rem;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-default);
-      border-radius: 8px;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      font-family: var(--font-mono);
-    }
-    
-    /* Footer */
-    .footer {
-      padding: var(--space-6) 0;
-      border-top: 1px solid var(--border-subtle);
-      text-align: center;
-    }
-    
-    .footer-content {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-3);
-      align-items: center;
-    }
-    
-    .footer-text {
-      color: var(--text-muted);
-      font-size: 0.875rem;
-    }
-    
-    .footer-links {
-      display: flex;
-      gap: var(--space-4);
-      flex-wrap: wrap;
-    }
-    
-    .footer-link {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 0.875rem;
-      transition: color var(--transition-base);
-    }
-    
-    .footer-link:hover {
-      color: var(--accent-primary);
-    }
-    
-    /* Code Block */
-    .code-block {
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-default);
-      border-radius: 12px;
-      padding: var(--space-4);
-      margin: var(--space-4) 0;
-      overflow-x: auto;
-    }
-    
-    .code-block code {
-      font-family: var(--font-mono);
-      font-size: 0.875rem;
-      color: var(--accent-primary);
-      line-height: 1.8;
-    }
-    
-    /* Email Capture */
-    .email-form {
-      max-width: 560px;
-      margin: 0 auto;
-    }
-    
-    .email-input-group {
-      display: flex;
-      gap: var(--space-2);
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-default);
-      border-radius: 14px;
-      padding: 6px;
-      transition: border-color var(--transition-base);
-    }
-    
-    .email-input-group:focus-within {
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-    
-    .email-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      padding: var(--space-2) var(--space-3);
-      font-size: 1rem;
-      font-family: var(--font-sans);
-      color: var(--text-primary);
-    }
-    
-    .email-input::placeholder {
-      color: var(--text-muted);
-    }
-    
-    .email-btn {
-      padding: var(--space-2) var(--space-4);
-      border-radius: 10px;
-      font-size: 1rem;
-      white-space: nowrap;
-    }
-    
-    .email-note {
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 0.8125rem;
-      margin-top: var(--space-2);
-    }
-    
-    .email-success {
-      text-align: center;
-      color: var(--status-success);
-      font-size: 1rem;
-      font-weight: 600;
-      margin-top: var(--space-3);
-      animation: fadeIn 0.4s ease;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-      .hero {
-        min-height: 80vh;
-      }
-      
-      .hero-emoji {
-        font-size: 4rem;
-      }
-      
-      .hero-cta {
-        flex-direction: column;
-        width: 100%;
-      }
-      
-      .btn {
-        width: 100%;
-        justify-content: center;
-      }
-      
-      .section {
-        padding: var(--space-8) 0;
-      }
-      
-      .email-input-group {
-        flex-direction: column;
-      }
-      
-      .email-btn {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- SEO -->
+<title>Clawd Control — Open-Source AI Agent Health Monitoring</title>
+<meta name="description" content="Open-source health monitoring for AI agent teams. Track skills, configs, and system health across your Clawdbot agents. Free forever.">
+<meta name="keywords" content="AI agents, Clawdbot, monitoring, dashboard, health check, agent management, open source">
+<meta name="author" content="Clawd Control">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://clawdcontrol.com/">
+<meta property="og:title" content="Clawd Control — Open-Source AI Agent Health Monitoring">
+<meta property="og:description" content="Open-source health monitoring for AI agent teams. Free forever.">
+<meta property="og:image" content="https://clawdcontrol.com/og-image.png">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://clawdcontrol.com/">
+<meta name="twitter:title" content="Clawd Control — Open-Source AI Agent Health Monitoring">
+<meta name="twitter:description" content="Open-source health monitoring for AI agent teams. Free forever.">
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏰</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════
+   CLAWD CONTROL — Landing Page
+   Design system matched to dashboard
+   ═══════════════════════════════════════════ */
+
+:root {
+  --bg-primary: #0a0c10;
+  --bg-secondary: #13151a;
+  --bg-tertiary: #1a1d27;
+  --surface: #232732;
+  --surface-hover: #2a2f3d;
+  --border: #363b4d;
+  --border-subtle: #252835;
+
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+
+  --success: #22c55e;
+  --success-bg: rgba(34, 197, 94, 0.1);
+  --error: #ef4444;
+  --error-bg: rgba(239, 68, 68, 0.1);
+  --warning: #f59e0b;
+  --warning-bg: rgba(245, 158, 11, 0.1);
+  --info: #3b82f6;
+  --info-bg: rgba(59, 130, 246, 0.1);
+
+  --accent: #c9a44a;
+  --accent-hover: #d4b05f;
+  --accent-bg: rgba(201, 164, 74, 0.1);
+  --accent-dim: rgba(201, 164, 74, 0.06);
+  --accent-glow: rgba(201, 164, 74, 0.25);
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.5);
+
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Reset ─────────────────────────────── */
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html {
+  font-size: 16px; scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  color-scheme: dark;
+}
+body {
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+h1, h2, h3 { line-height: 1.2; font-weight: 700; letter-spacing: -0.02em; }
+
+/* ── Scrollbar ─────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.16); }
+
+/* ── Accessibility ─────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+*:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+*:focus:not(:focus-visible) { outline: none; }
+
+/* ── Animations ────────────────────────── */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes gridMove {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(40px, 40px); }
+}
+@keyframes typeCursor { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+@keyframes countUp { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+
+.fade-up { animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* ── Layout ────────────────────────────── */
+
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+.section { padding: 100px 0; position: relative; }
+
+/* ── Topbar ────────────────────────────── */
+
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 48px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+  background: rgba(10, 12, 16, 0.8);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 8px var(--success), 0 0 16px rgba(34,197,94,0.15);
+  animation: pulse 2s infinite;
+}
+.topbar-title { font-size: 0.9rem; font-weight: 700; letter-spacing: -0.02em; }
+.topbar-right { display: flex; align-items: center; gap: 4px; }
+.topbar-link {
+  padding: 5px 10px; border-radius: var(--radius-sm);
+  font-size: 0.78rem; font-weight: 500; color: var(--text-secondary);
+  text-decoration: none; transition: all var(--transition-fast);
+}
+.topbar-link:hover { color: var(--text-primary); background: var(--surface); }
+.topbar-cta {
+  padding: 5px 12px; border-radius: var(--radius-sm);
+  font-size: 0.78rem; font-weight: 600; color: var(--bg-primary);
+  background: var(--accent); text-decoration: none;
+  transition: all var(--transition-fast);
+}
+.topbar-cta:hover { background: var(--accent-hover); }
+
+/* ── Animated Grid Background ──────────── */
+
+.grid-bg {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+}
+.grid-bg::before {
+  content: '';
+  position: absolute; inset: -40px;
+  background-image:
+    linear-gradient(var(--border-subtle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.4;
+  animation: gridMove 8s linear infinite;
+}
+.grid-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 30%, transparent 0%, var(--bg-primary) 70%);
+}
+
+/* ── Hero ──────────────────────────────── */
+
+.hero {
+  min-height: 100vh; display: flex; align-items: center;
+  position: relative; padding-top: 48px;
+}
+
+.hero-glow {
+  position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, var(--accent-glow) 0%, rgba(201,164,74,0.08) 40%, transparent 70%);
+  filter: blur(60px);
+  pointer-events: none;
+  animation: pulse 6s ease-in-out infinite;
+}
+
+.hero-content { position: relative; z-index: 1; text-align: center; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px 4px 6px; margin-bottom: 24px;
+  background: var(--surface); border: 1px solid var(--border-subtle);
+  border-radius: 20px; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);
+}
+.hero-badge-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 6px var(--success);
+  animation: pulse 2s infinite;
+}
+.hero-badge-text { text-transform: uppercase; letter-spacing: 0.06em; }
+
+.hero-title {
+  font-size: clamp(3rem, 7vw, 5.5rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 20px;
+}
+.hero-title .accent {
+  background: linear-gradient(135deg, var(--accent), var(--accent-hover), #e8c86e);
+  background-size: 200% auto;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s ease-in-out infinite;
+}
+
+.hero-sub {
+  font-size: clamp(1rem, 2vw, 1.25rem); color: var(--text-secondary);
+  max-width: 560px; margin: 0 auto 32px; line-height: 1.7;
+}
+
+.hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* ── Buttons ───────────────────────────── */
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border: none; border-radius: var(--radius-md);
+  font-family: var(--font-sans); font-size: 0.9rem; font-weight: 600;
+  text-decoration: none; cursor: pointer; transition: all var(--transition-base);
+}
+.btn-primary {
+  background: var(--accent); color: var(--bg-primary);
+  box-shadow: 0 0 20px var(--accent-dim), 0 0 40px rgba(201,164,74,0.08);
+}
+.btn-primary:hover {
+  background: var(--accent-hover); transform: translateY(-1px);
+  box-shadow: 0 0 30px var(--accent-glow), 0 4px 20px rgba(0,0,0,0.3);
+}
+.btn-secondary {
+  background: var(--surface); color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+}
+.btn-secondary:hover {
+  border-color: var(--border); background: var(--surface-hover);
+}
+.btn-icon { font-size: 1.1rem; }
+
+/* ── Live Demo Card ────────────────────── */
+
+.demo-section { padding: 0 0 80px; position: relative; margin-top: -60px; }
+
+.demo-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg), 0 0 80px rgba(201,164,74,0.04);
+}
+
+.demo-topbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.75rem; color: var(--text-tertiary);
+}
+.demo-dots { display: flex; gap: 5px; }
+.demo-dots span {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--border);
+}
+.demo-dots span:first-child { background: #ef4444; }
+.demo-dots span:nth-child(2) { background: #f59e0b; }
+.demo-dots span:nth-child(3) { background: #22c55e; }
+.demo-url { flex: 1; text-align: center; font-family: var(--font-mono); font-size: 0.7rem; }
+
+.demo-content { padding: 20px; }
+
+/* Mock dashboard inside demo */
+.mock-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px;
+}
+.mock-stat {
+  background: var(--surface); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md); padding: 12px 14px;
+}
+.mock-stat-label {
+  font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-tertiary); font-weight: 600; margin-bottom: 3px;
+}
+.mock-stat-value {
+  font-size: 1.3rem; font-weight: 800; font-variant-numeric: tabular-nums;
+}
+.mock-stat-value.s { color: var(--success); }
+.mock-stat-value.a { color: var(--accent); }
+
+.mock-fleet {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+  font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text-tertiary);
+}
+.mock-fleet-bar {
+  flex: 1; height: 5px; border-radius: 3px; overflow: hidden; display: flex; gap: 1px;
+}
+.mock-fleet-bar .seg { border-radius: 2px; }
+.mock-fleet-bar .ok { background: var(--success); flex: 8; }
+.mock-fleet-bar .warn { background: var(--warning); flex: 1; }
+.mock-fleet-bar .err { background: var(--error); flex: 0.5; }
+.mock-fleet-pct { font-weight: 700; color: var(--text-primary); }
+
+.mock-agents { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.mock-agent {
+  background: var(--surface); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md); padding: 12px 14px;
+  transition: all var(--transition-base);
+}
+.mock-agent:hover { border-color: var(--border); box-shadow: var(--shadow-md); }
+.mock-agent.healthy { border-left: 3px solid var(--success); }
+.mock-agent.degraded { border-left: 3px solid var(--warning); }
+.mock-agent-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+}
+.mock-agent-name { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.85rem; }
+.mock-badge {
+  font-size: 0.55rem; padding: 2px 6px; border-radius: var(--radius-sm);
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+}
+.mock-badge.online { background: var(--success-bg); color: var(--success); }
+.mock-badge.warn { background: var(--warning-bg); color: var(--warning); }
+
+.mock-health-bar { display: flex; gap: 2px; height: 3px; border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+.mock-health-seg { flex: 1; border-radius: 1px; }
+
+.mock-pills { display: flex; gap: 3px; flex-wrap: wrap; }
+.mock-pill {
+  font-size: 0.6rem; padding: 1px 5px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; gap: 3px;
+  background: var(--bg-primary); color: var(--text-secondary);
+}
+.mock-pill .dot { width: 4px; height: 4px; border-radius: 50%; }
+.dot.g { background: var(--success); }
+.dot.y { background: var(--warning); }
+.dot.r { background: var(--error); }
+
+/* ── Section Headers ───────────────────── */
+
+.section-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; margin-bottom: 12px;
+  background: var(--accent-bg); border: 1px solid rgba(201,164,74,0.15);
+  border-radius: 20px; font-size: 0.68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent);
+}
+.section-title {
+  font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800;
+  margin-bottom: 12px; letter-spacing: -0.02em;
+}
+.section-desc {
+  font-size: 1.05rem; color: var(--text-secondary); max-width: 600px; line-height: 1.7;
+}
+.section-header { margin-bottom: 48px; }
+.section-header.center { text-align: center; }
+.section-header.center .section-desc { margin: 0 auto; }
+
+/* ── Features Grid ─────────────────────── */
+
+.features-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+}
+.feature-card {
+  background: var(--surface); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md); padding: 24px;
+  transition: all var(--transition-base); position: relative; overflow: hidden;
+}
+.feature-card:hover {
+  border-color: var(--border); box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.feature-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0; transition: opacity var(--transition-base);
+}
+.feature-card:hover::before { opacity: 1; }
+
+.feature-icon {
+  width: 36px; height: 36px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; margin-bottom: 14px;
+}
+.feature-icon.green { background: var(--success-bg); }
+.feature-icon.blue { background: var(--info-bg); }
+.feature-icon.gold { background: var(--accent-bg); }
+.feature-icon.red { background: var(--error-bg); }
+.feature-icon.yellow { background: var(--warning-bg); }
+
+.feature-title {
+  font-size: 1rem; font-weight: 700; margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+.feature-desc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; }
+
+/* ── Terminal Section ──────────────────── */
+
+.terminal {
+  background: var(--bg-secondary); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg); overflow: hidden;
+  font-family: var(--font-mono); font-size: 0.82rem;
+  box-shadow: var(--shadow-lg);
+}
+.terminal-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px; background: var(--surface);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.terminal-bar .dots { display: flex; gap: 5px; }
+.terminal-bar .dots span { width: 10px; height: 10px; border-radius: 50%; }
+.terminal-bar .dots span:nth-child(1) { background: #ef4444; }
+.terminal-bar .dots span:nth-child(2) { background: #f59e0b; }
+.terminal-bar .dots span:nth-child(3) { background: #22c55e; }
+.terminal-bar .title { flex: 1; text-align: center; font-size: 0.7rem; color: var(--text-tertiary); }
+
+.terminal-body { padding: 20px; line-height: 1.9; }
+.terminal-line { display: flex; gap: 8px; }
+.terminal-prompt { color: var(--accent); font-weight: 600; user-select: none; }
+.terminal-cmd { color: var(--text-primary); }
+.terminal-comment { color: var(--text-tertiary); }
+.terminal-output { color: var(--success); padding-left: 18px; }
+.terminal-cursor {
+  display: inline-block; width: 8px; height: 16px; background: var(--accent);
+  animation: typeCursor 1s step-end infinite; vertical-align: text-bottom;
+  margin-left: 2px;
+}
+
+/* ── Stats Bar ─────────────────────────── */
+
+.stats-bar {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  padding: 60px 0;
+}
+.stat-item { text-align: center; }
+.stat-number {
+  font-size: 2.5rem; font-weight: 900; letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums; color: var(--accent);
+}
+.stat-label {
+  font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text-tertiary); margin-top: 4px;
+}
+
+/* ── CTA / Email Section ───────────────── */
+
+.cta-section {
+  text-align: center; padding: 80px 0;
+  position: relative;
+}
+.cta-section .section-title { margin-bottom: 8px; }
+
+.email-form { max-width: 480px; margin: 24px auto 0; }
+.email-input-group {
+  display: flex; gap: 8px;
+  background: var(--surface); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md); padding: 5px;
+  transition: all var(--transition-base);
+}
+.email-input-group:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-dim);
+}
+.email-input {
+  flex: 1; background: transparent; border: none; outline: none;
+  padding: 8px 12px; font-size: 0.9rem; font-family: var(--font-sans);
+  color: var(--text-primary);
+}
+.email-input::placeholder { color: var(--text-tertiary); }
+.email-btn {
+  padding: 8px 18px; border-radius: var(--radius-sm);
+  font-size: 0.85rem; white-space: nowrap;
+}
+.email-note {
+  text-align: center; color: var(--text-tertiary);
+  font-size: 0.75rem; margin-top: 10px;
+}
+.email-success {
+  text-align: center; color: var(--success); font-size: 0.95rem;
+  font-weight: 600; margin-top: 16px;
+  animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Footer ────────────────────────────── */
+
+.footer {
+  padding: 24px 0; border-top: 1px solid var(--border-subtle);
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 0.75rem; color: var(--text-tertiary);
+}
+.footer-links { display: flex; gap: 16px; }
+.footer-link {
+  color: var(--text-tertiary); text-decoration: none;
+  transition: color var(--transition-fast);
+}
+.footer-link:hover { color: var(--text-secondary); }
+
+/* ── Scroll Reveal ─────────────────────── */
+
+.reveal {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── Responsive ────────────────────────── */
+
+@media (max-width: 800px) {
+  .mock-stats { grid-template-columns: repeat(2, 1fr); }
+  .mock-agents { grid-template-columns: 1fr; }
+  .features-grid { grid-template-columns: 1fr; }
+  .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+  .hero-title { font-size: clamp(2.2rem, 8vw, 3.5rem); }
+  .topbar-right { display: none; }
+  .footer { flex-direction: column; gap: 12px; text-align: center; }
+  .email-input-group { flex-direction: column; }
+  .email-btn { width: 100%; justify-content: center; }
+}
+</style>
 </head>
 <body>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-content">
-        <div class="hero-emoji">🏰</div>
-        <h1 class="hero-title">Clawd Control</h1>
-        <p class="hero-subtitle">
-          Open-source health monitoring for AI agent teams.
-          Track skills, configs, and system health across your Clawdbot agents — free forever.
-        </p>
-        <div class="hero-cta">
-          <a href="https://github.com/gandalf-temaki/clawd-control" class="btn btn-primary" target="_blank" rel="noopener">
-            <span>⭐ Star on GitHub</span>
-          </a>
-          <a href="#features" class="btn btn-secondary">
-            <span>Learn More</span>
-          </a>
+<!-- ── Topbar ── -->
+<nav class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-dot"></span>
+    <span class="topbar-title">Clawd Control</span>
+  </div>
+  <div class="topbar-right">
+    <a href="#features" class="topbar-link">Features</a>
+    <a href="#quickstart" class="topbar-link">Quick Start</a>
+    <a href="https://github.com/gandalf-temaki/clawd-control" class="topbar-cta" target="_blank" rel="noopener">⭐ GitHub</a>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="grid-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge fade-up">
+        <span class="hero-badge-dot"></span>
+        <span class="hero-badge-text">Open Source · Free Forever</span>
+      </div>
+      <h1 class="hero-title fade-up" style="animation-delay:.1s">
+        Health monitoring<br>for <span class="accent">AI agents</span>
+      </h1>
+      <p class="hero-sub fade-up" style="animation-delay:.2s">
+        Track skills, configs, and system health across your Clawdbot agents.
+        Real-time dashboards. Zero dependencies. Production-grade.
+      </p>
+      <div class="hero-actions fade-up" style="animation-delay:.3s">
+        <a href="https://github.com/gandalf-temaki/clawd-control" class="btn btn-primary" target="_blank" rel="noopener">
+          <span class="btn-icon">⭐</span> Star on GitHub
+        </a>
+        <a href="#quickstart" class="btn btn-secondary">
+          Get Started
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Live Demo ── -->
+<section class="demo-section">
+  <div class="container">
+    <div class="demo-card reveal">
+      <div class="demo-topbar">
+        <div class="demo-dots"><span></span><span></span><span></span></div>
+        <span class="demo-url">localhost:3000</span>
+      </div>
+      <div class="demo-content">
+        <div class="mock-stats">
+          <div class="mock-stat">
+            <div class="mock-stat-label">Agents</div>
+            <div class="mock-stat-value a">4</div>
+          </div>
+          <div class="mock-stat">
+            <div class="mock-stat-label">Online</div>
+            <div class="mock-stat-value s">4</div>
+          </div>
+          <div class="mock-stat">
+            <div class="mock-stat-label">7d API Cost</div>
+            <div class="mock-stat-value a">~$12.48</div>
+          </div>
+          <div class="mock-stat">
+            <div class="mock-stat-label">Fleet Health</div>
+            <div class="mock-stat-value s">94%</div>
+          </div>
+        </div>
+
+        <div class="mock-fleet">
+          <span>Fleet Health</span>
+          <div class="mock-fleet-bar">
+            <div class="seg ok"></div>
+            <div class="seg warn"></div>
+            <div class="seg err"></div>
+          </div>
+          <span class="mock-fleet-pct">29/31 passed</span>
+        </div>
+
+        <div class="mock-agents">
+          <div class="mock-agent healthy">
+            <div class="mock-agent-header">
+              <div class="mock-agent-name"><span>🧙</span> Gandalf</div>
+              <span class="mock-badge online">● Healthy</span>
+            </div>
+            <div class="mock-health-bar">
+              <div class="mock-health-seg" style="background:var(--success)"></div>
+              <div class="mock-health-seg" style="background:var(--success)"></div>
+              <div class="mock-health-seg" style="background:var(--success)"></div>
+              <div class="mock-health-seg" style="background:var(--success)"></div>
+              <div class="mock-health-seg" style="background:var(--success)"></div>
+            </div>
+            <div class="mock-pills">
+              <span class="mock-pill"><span class="dot g"></span>Skills</span>
+              <span class="mock-pill"><span class="dot g"></span>Memory</span>
+              <span class="mock-pill"><span class="dot g"></span>Gateway</span>
+              <span class="mock-pill"><span class="dot g"></span>GitHub</span>
+            </div>
+          </div>
+
+          <div class="mock-agent degraded">
+            <div class="mock-agent-header">
+              <div class="mock-agent-name"><span>🍏</span> Pippin</div>
+              <span class="mock-badge warn">◐ Degraded</span>
+            </div>
+            <div class="mock-health-bar">
+              <div class="mock-health-seg" style="background:var(--success)"></div>
+              <div class="mock-health-seg" style="background:var(--success)"></div>
+              <div class="mock-health-seg" style="background:var(--warning)"></div>
+              <div class="mock-health-seg" style="background:var(--success)"></div>
+              <div class="mock-health-seg" style="background:var(--success)"></div>
+            </div>
+            <div class="mock-pills">
+              <span class="mock-pill"><span class="dot g"></span>Skills</span>
+              <span class="mock-pill"><span class="dot y"></span>Memory</span>
+              <span class="mock-pill"><span class="dot g"></span>Gateway</span>
+              <span class="mock-pill"><span class="dot g"></span>GitHub</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Features Section -->
-  <section class="section" id="features">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Features</span>
-        <h2 class="section-title">Everything You Need to Monitor Your Agents</h2>
-        <p class="section-description">
-          Comprehensive health checks, real-time insights, and beautiful visualizations 
-          for your AI agent ecosystem.
-        </p>
-      </div>
-      
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">✅</div>
-          <h3 class="feature-title">31-Point Health Checks</h3>
-          <p class="feature-description">
-            Verify essential skills, workspace files, credentials, gateway configs, 
-            memory architecture, and more. Comprehensive validation for every agent.
-          </p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">📊</div>
-          <h3 class="feature-title">Interactive Dashboards</h3>
-          <p class="feature-description">
-            Beautiful card-based UI with real-time data, trend charts, and detailed 
-            drill-down views. Production-grade 2026 design system.
-          </p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">📈</div>
-          <h3 class="feature-title">Health Trend Tracking</h3>
-          <p class="feature-description">
-            Visualize agent health over time with interactive SVG charts. 
-            Spot degradation early and track improvements with 7/30/90-day views.
-          </p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">🎯</div>
-          <h3 class="feature-title">Category Breakdown</h3>
-          <p class="feature-description">
-            Organized checks across Workspace Files, Essential Skills, Credentials, 
-            Memory, Scripts, Gateway Config, and GitHub integration.
-          </p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">⚡</div>
-          <h3 class="feature-title">Agent Creation Wizard</h3>
-          <p class="feature-description">
-            Multi-step wizard to set up new agents with guided configuration. 
-            Select skills, configure heartbeat, and customize settings with ease.
-          </p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">♿</div>
-          <h3 class="feature-title">Fully Accessible</h3>
-          <p class="feature-description">
-            WCAG 2.2 AA compliant with keyboard navigation, screen reader support, 
-            and reduced-motion options. Built for everyone.
-          </p>
-        </div>
-      </div>
+<!-- ── Features ── -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-header center reveal">
+      <span class="section-tag">Features</span>
+      <h2 class="section-title">Everything you need to monitor your agents</h2>
+      <p class="section-desc">
+        Comprehensive health checks, real-time insights, and beautiful visualizations
+        for your AI agent ecosystem.
+      </p>
     </div>
-  </section>
 
-  <!-- Tech Stack Section -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Technology</span>
-        <h2 class="section-title">Built with Modern Standards</h2>
-        <p class="section-description">
-          Zero external dependencies. Pure HTML, CSS, and JavaScript. 
-          Fast, secure, and maintainable.
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon green">✅</div>
+        <h3 class="feature-title">31-Point Health Checks</h3>
+        <p class="feature-desc">
+          Validate skills, workspace files, credentials, gateway configs,
+          memory architecture, and more. Every agent, every time.
         </p>
       </div>
-      
-      <div class="tech-stack">
-        <span class="tech-badge">Node.js</span>
-        <span class="tech-badge">ES Modules</span>
-        <span class="tech-badge">CSS Variables</span>
-        <span class="tech-badge">SVG Charts</span>
-        <span class="tech-badge">Fluid Typography</span>
-        <span class="tech-badge">8px Grid System</span>
-        <span class="tech-badge">Mobile-First</span>
-        <span class="tech-badge">WCAG 2.2 AA</span>
-      </div>
-      
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-value">31</div>
-          <div class="stat-label">Health Checks</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">100%</div>
-          <div class="stat-label">Accessible</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">0</div>
-          <div class="stat-label">Dependencies</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Getting Started Section -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Quick Start</span>
-        <h2 class="section-title">Get Started in Minutes</h2>
-        <p class="section-description">
-          Clone the repository and run your first health check.
+      <div class="feature-card reveal">
+        <div class="feature-icon blue">📊</div>
+        <h3 class="feature-title">Real-Time Dashboard</h3>
+        <p class="feature-desc">
+          Live SSE updates, agent cards with health bars, fleet overview,
+          and session management. No refresh needed.
         </p>
       </div>
-      
-      <div class="code-block">
-        <code># Clone the repository
-git clone https://github.com/gandalf-temaki/clawd-control.git
-cd clawd-control
-
-# Run health check
-node check.mjs --workspace /path/to/agent/workspace
-
-# Start collecting historical data
-node collect-history.mjs --all
-
-# Open dashboard
-open dashboard-v2.html</code>
-      </div>
-    </div>
-  </section>
-
-  <!-- Email Capture Section -->
-  <section class="section" id="waitlist">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Stay Updated</span>
-        <h2 class="section-title">Join the Community</h2>
-        <p class="section-description">
-          Get notified about new releases, guides, and community contributions.
-          Open source — built in the open, together.
+      <div class="feature-card reveal">
+        <div class="feature-icon gold">📈</div>
+        <h3 class="feature-title">Health Trend Tracking</h3>
+        <p class="feature-desc">
+          Interactive SVG charts showing agent health over time.
+          Spot degradation early with 7/30/90-day views.
         </p>
       </div>
-      
-      <form class="email-form" id="waitlistForm" action="#" method="POST">
-        <div class="email-input-group">
-          <input 
-            type="email" 
-            class="email-input" 
-            id="emailInput"
-            name="email" 
-            placeholder="you@example.com" 
-            required 
-            autocomplete="email"
-            aria-label="Email address"
-          >
-          <button type="submit" class="btn btn-primary email-btn">
-            <span>Join Waitlist</span>
-            <span>→</span>
-          </button>
-        </div>
-        <p class="email-note">No spam, ever. Unsubscribe anytime.</p>
-        <p class="email-success" id="emailSuccess" hidden>
-          🎉 You're in! We'll be in touch.
+      <div class="feature-card reveal">
+        <div class="feature-icon yellow">⚡</div>
+        <h3 class="feature-title">Agent Controls</h3>
+        <p class="feature-desc">
+          Trigger heartbeats, manage sessions, enable/disable features —
+          all from the dashboard. One click, instant feedback.
         </p>
-      </form>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <p class="footer-text">
-          Open source — built by AI agents, for AI agents 🍏
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon red">🔒</div>
+        <h3 class="feature-title">Secure by Default</h3>
+        <p class="feature-desc">
+          Token-based auth, no external dependencies, runs on your
+          machine. Your agent data stays yours.
         </p>
-        <div class="footer-links">
-          <a href="https://github.com/gandalf-temaki/clawd-control" class="footer-link" target="_blank" rel="noopener">GitHub</a>
-          <a href="https://github.com/gandalf-temaki/clawd-control/blob/main/README.md" class="footer-link" target="_blank" rel="noopener">Documentation</a>
-          <a href="https://github.com/gandalf-temaki/clawd-control/issues" class="footer-link" target="_blank" rel="noopener">Issues</a>
-          <a href="https://clawdcontrol.com" class="footer-link">Home</a>
-        </div>
-        <p class="footer-text" style="margin-top: var(--space-2); font-size: 0.75rem;">
-          © 2026 Clawd Control · Open Source · MIT License
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon green">♿</div>
+        <h3 class="feature-title">Fully Accessible</h3>
+        <p class="feature-desc">
+          WCAG 2.2 AA compliant. Keyboard navigation, screen readers,
+          reduced-motion, dark & light themes.
         </p>
       </div>
     </div>
-  </footer>
+  </div>
+</section>
 
-  <script>
-    const FORMSPARK_ACTION = 'https://submit-form.com/bTiV6XSOO';
-    // Discord webhook — set this to post signups to a channel
-    const DISCORD_WEBHOOK = 'DISCORD_WEBHOOK_URL';
-    
-    document.getElementById('waitlistForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('emailInput').value;
-      const btn = e.target.querySelector('.email-btn');
-      const successMsg = document.getElementById('emailSuccess');
-      
-      btn.innerHTML = '<span>Joining...</span>';
-      btn.disabled = true;
-      
-      try {
-        // Save to Formspark
-        await fetch(FORMSPARK_ACTION, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({ email, _email: { subject: 'New Clawd Control signup' } })
-        });
-        
-        // Notify Discord
-        if (DISCORD_WEBHOOK && !DISCORD_WEBHOOK.includes('DISCORD_WEBHOOK_URL')) {
-          fetch(DISCORD_WEBHOOK, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              embeds: [{
-                title: '🏰 New Clawd Control Signup',
-                description: `**${email}** joined the community!`,
-                color: 0xc9a44a,
-                timestamp: new Date().toISOString()
-              }]
-            })
-          }).catch(() => {}); // fire-and-forget
-        }
-        
-        successMsg.hidden = false;
-        document.querySelector('.email-input-group').style.display = 'none';
-        document.querySelector('.email-note').style.display = 'none';
-      } catch (err) {
-        btn.innerHTML = '<span>Try Again</span><span>→</span>';
-        btn.disabled = false;
-      }
+<!-- ── Stats ── -->
+<div class="container">
+  <div class="stats-bar reveal">
+    <div class="stat-item">
+      <div class="stat-number" data-count="31">0</div>
+      <div class="stat-label">Health Checks</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number" data-count="0">0</div>
+      <div class="stat-label">Dependencies</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number" data-count="100">0</div>
+      <div class="stat-label">% Accessible</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number" data-text="MIT">—</div>
+      <div class="stat-label">License</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Quick Start ── -->
+<section class="section" id="quickstart">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="section-tag">Quick Start</span>
+      <h2 class="section-title">Up and running in 60 seconds</h2>
+      <p class="section-desc">Clone, configure, launch. That's it.</p>
+    </div>
+
+    <div class="terminal reveal">
+      <div class="terminal-bar">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="title">Terminal</span>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd">git clone https://github.com/gandalf-temaki/clawd-control.git</span></div>
+        <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd">cd clawd-control</span></div>
+        <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cmd">node server.mjs</span></div>
+        <div class="terminal-output">🏰 Clawd Control running on http://localhost:3000</div>
+        <div class="terminal-output" style="color: var(--success);">✓ 4 agents discovered · SSE streaming · dashboard ready</div>
+        <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cursor"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA / Email ── -->
+<section class="cta-section" id="community">
+  <div class="grid-bg" style="opacity:0.3"></div>
+  <div class="container" style="position:relative; z-index:1;">
+    <div class="section-header center reveal">
+      <span class="section-tag">Community</span>
+      <h2 class="section-title">Join the community</h2>
+      <p class="section-desc">
+        Get notified about new releases, guides, and community contributions.
+      </p>
+    </div>
+
+    <form class="email-form reveal" id="waitlistForm" action="#" method="POST">
+      <div class="email-input-group">
+        <input type="email" class="email-input" id="emailInput" name="email"
+          placeholder="you@example.com" required autocomplete="email" aria-label="Email address">
+        <button type="submit" class="btn btn-primary email-btn">
+          <span>Subscribe</span>
+        </button>
+      </div>
+      <p class="email-note">No spam, ever. Unsubscribe anytime.</p>
+      <p class="email-success" id="emailSuccess" hidden>🎉 You're in! We'll keep you posted.</p>
+    </form>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer class="container">
+  <div class="footer">
+    <span>© 2026 Clawd Control · Open Source</span>
+    <div class="footer-links">
+      <a href="https://github.com/gandalf-temaki/clawd-control" class="footer-link" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/gandalf-temaki/clawd-control/blob/main/README.md" class="footer-link" target="_blank" rel="noopener">Docs</a>
+      <a href="https://github.com/gandalf-temaki/clawd-control/issues" class="footer-link" target="_blank" rel="noopener">Issues</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════
+// Scroll Reveal
+// ═══════════════════════════════════════════
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ═══════════════════════════════════════════
+// Animated Counters
+// ═══════════════════════════════════════════
+
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    const target = el.dataset.count;
+    const text = el.dataset.text;
+    if (text) { el.textContent = text; counterObserver.unobserve(el); return; }
+    const end = parseInt(target);
+    const duration = 1200;
+    const start = performance.now();
+    function tick(now) {
+      const t = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.round(ease * end);
+      if (t < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+    counterObserver.unobserve(el);
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('[data-count], [data-text]').forEach(el => counterObserver.observe(el));
+
+// ═══════════════════════════════════════════
+// Email Form — Formspark + Discord
+// ═══════════════════════════════════════════
+
+const FORMSPARK_ACTION = 'https://submit-form.com/bTiV6XSOO';
+const DISCORD_WEBHOOK = 'DISCORD_WEBHOOK_URL';
+
+document.getElementById('waitlistForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('emailInput').value;
+  const btn = e.target.querySelector('.email-btn');
+  const successMsg = document.getElementById('emailSuccess');
+
+  btn.innerHTML = '<span>Joining...</span>';
+  btn.disabled = true;
+
+  try {
+    await fetch(FORMSPARK_ACTION, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ email, _email: { subject: 'New Clawd Control signup' } })
     });
-  </script>
+
+    if (DISCORD_WEBHOOK && !DISCORD_WEBHOOK.includes('DISCORD_WEBHOOK_URL')) {
+      fetch(DISCORD_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          embeds: [{
+            title: '🏰 New Clawd Control Signup',
+            description: `**${email}** joined the community!`,
+            color: 0xc9a44a,
+            timestamp: new Date().toISOString()
+          }]
+        })
+      }).catch(() => {});
+    }
+
+    successMsg.hidden = false;
+    document.querySelector('.email-input-group').style.display = 'none';
+    document.querySelector('.email-note').style.display = 'none';
+  } catch (err) {
+    btn.innerHTML = '<span>Try Again</span>';
+    btn.disabled = false;
+  }
+});
+</script>
 
 </body>
 </html>
